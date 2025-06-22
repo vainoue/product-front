@@ -1,7 +1,7 @@
 const API_BASE = import.meta.env.VITE_API_URL;
 
-const PRODUCT_API_URL = `${API_BASE}/Products`;
-const USER_API_URL = `${API_BASE}/Users`;
+const PRODUCT_API_URL = `${API_BASE}/api/Products`;
+const USER_API_URL = `${API_BASE}/api/Users`;
 
 export async function getProducts() {
     const res = await fetch(PRODUCT_API_URL);
