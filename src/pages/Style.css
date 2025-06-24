@@ -17,6 +17,13 @@ body {
   align-items: center;
   min-height: 100vh;
   color-scheme: light;
+  color: #000;
+}
+
+input,
+button {
+  background-color: #fff;
+  color: #000;
 }
 
 .auth-container {
