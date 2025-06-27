@@ -4,7 +4,7 @@ import ProductList from '../components/ProductList';
 import EditProductForm from '../components/EditProductForm';
 import ConfirmToast from '../components/ConfirmToast';
 import { getProducts, createProduct, removeProduct, editProduct as updateProduct } from '../services/api';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
@@ -86,14 +86,21 @@ export default function Product() {
     logout();
     toast.success("Logged out successfully!");
     navigate("/login");
-  }
+  };
+
+  const handleEditProfile = () => {
+    navigate("/edit-profile");
+  };
 
   return (
     <div className="app-container">
         <div className="header-container">
             <h1>Products</h1>
             <span className="username">Hello, {user?.username}</span>
-            <button onClick={handleLogout} className="logout-button" title="Logout">Logout</button>
+        </div>
+        <div className="actions-container">
+          <button onClick={handleEditProfile} className="edit-profile-button" title="Edit Profile">Edit Profile</button>
+          <button onClick={handleLogout} className="logout-button" title="Logout">Logout</button>
         </div>
         <label htmlFor="sortOrder"> Sort by ID: </label>
         <select
@@ -118,7 +125,6 @@ export default function Product() {
         onRemove={handleRemove}
         onEdit={handleEditClick}
       />
-      <ToastContainer position="top-right" autoClose={2500}/>
     </div>
   );
 }

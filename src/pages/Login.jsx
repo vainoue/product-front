@@ -12,6 +12,7 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
     const { login } = useAuth();
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -19,13 +20,18 @@ export default function Login() {
             toast.warn("Please fill in all fields");
             return;
         }
+
+        setLoading(true);
+
         try {
             const data = await loginUser({ username, password });
-            login({ username: data.username});
+            login({ id: data.id, username: data.username, email: data.email, birthdate: data.birthdate, photo: data.photo });
             toast.success("Login successful!");
             navigate("/products");
         } catch (error) {
             toast.error(error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -38,14 +44,23 @@ export default function Login() {
                     placeholder="Username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                    disabled={loading}
                 />
                 <input
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
                 />
-                <button type="submit" className="submit-button">Login</button>
+                <button type="submit" className="submit-button" disabled={loading}>
+                    {loading ? (
+                        <>
+                            Loading
+                            <span className="loader" />
+                        </>
+                    ) : ("Login")}
+                </button>
             </form>
             <button
                 type="button"

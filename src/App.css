@@ -62,6 +62,26 @@ button {
   color: #333;
 }
 
+.actions-container {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-profile-button {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.edit-profile-button:hover {
+  background-color: #1976d2;
+}
+
 @media (max-width: 600px) {
   .header-container {
     flex-direction: column;

@@ -66,9 +66,36 @@ export async function loginUser(userData) {
         },
         body: JSON.stringify(userData),
     });
-    const text = await res.text();
     if (!res.ok) {
+        const text = await res.text();
         throw new Error(text || "Username or password invalid");
     }
-    return text ? JSON.parse(text) : {};
+    return res.json();
+}
+
+export async function updateUser(userData) {
+    const res = await fetch(`${USER_API_URL}/update`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+    });
+    if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Failed to update user");
+    }
+    return res.json();
+}
+
+export async function updateUserPhoto(formData) {
+    const res = await fetch(`${USER_API_URL}/update-photo`, {
+        method: "PUT",
+        body: formData,
+    });
+    if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Failed to upload photo");
+    }
+    return res.json();
 }
