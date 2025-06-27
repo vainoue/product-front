@@ -12,7 +12,8 @@ export function AuthProvider({ children }) {
     }, []);
 
     const login = (userData) => {
-        localStorage.setItem("user", JSON.stringify(userData));
+        const { photo, ...userWithoutPhoto } = userData;
+        localStorage.setItem("user", JSON.stringify(userWithoutPhoto));
         setUser(userData);
     };
 
@@ -21,8 +22,20 @@ export function AuthProvider({ children }) {
         setUser(null);
     };
 
+    const updateUserContext = (updatedFields) => {
+        setUser((prevUser) => {
+            const updatedUser = {
+                ...prevUser,
+                ...updatedFields,
+            };
+            const { photo, ...userWithoutPhoto } = updatedUser;
+            localStorage.setItem("user", JSON.stringify(userWithoutPhoto));
+            return updatedUser;
+        });
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, login, logout, updateUserContext }}>
             {children}
         </AuthContext.Provider>
     );

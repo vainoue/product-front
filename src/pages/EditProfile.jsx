@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import './Style.css';
 
 export default function EditProfile() {
-    const { user } = useAuth();
+    const { user, updateUserContext } = useAuth();
     const [email, setEmail] = useState("");
     const [birthdate, setBirthdate] = useState(user?.birthdate || "");
     const [photo, setPhoto] = useState(null);
@@ -34,6 +34,7 @@ export default function EditProfile() {
 
         try {
             await updateUser({ username: user.username, email, birthdate });
+            updateUserContext({ email, birthdate });
             toast.success("User updated successfully");
         } catch (err) {
             toast.error("Error updating user");
@@ -66,10 +67,22 @@ export default function EditProfile() {
 
         try {
             await updateUserPhoto(formData);
+            updateUserContext({ photo: await convertToBase64(photo) });
+            setPhoto(null);
+            setPreview(null);
             toast.success("Photo uploaded!");
         } catch {
             toast.error("Upload failed");
         }
+    };
+
+    const convertToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
     };
 
     return (
