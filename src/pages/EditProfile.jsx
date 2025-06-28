@@ -13,11 +13,14 @@ export default function EditProfile() {
     const [photo, setPhoto] = useState(null);
     const [preview, setPreview] = useState(null);
     const navigate = useNavigate();
+    const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+    const currentPhoto = user?.photo ? `data:image/*;base64,${user.photo}` : null;
 
     useEffect(() => {
         /*console.log("user:", user);*/
         if (user?.photo) {
-            setPreview(`data:image/*;base64,${user.photo}`);
+            /*setPreview(`data:image/*;base64,${user.photo}`);*/
+            setPreview(null);
         }
         if (user?.email && email === "") {
             setEmail(user.email);
@@ -26,54 +29,52 @@ export default function EditProfile() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("click save");
-        if (!email && !birthdate) {
+
+        const normalizedEmail = email.trim();
+
+        if (!normalizedEmail && !birthdate && !photo) {
             toast.warn("Please fill at least one field");
             return;
         }
 
         try {
-            await updateUser({ username: user.username, email, birthdate });
-            updateUserContext({ email, birthdate });
-            toast.success("User updated successfully");
+            if (normalizedEmail || birthdate) {
+                const userUpdateData = {
+                    username: user.username,
+                    ...(normalizedEmail && { email: normalizedEmail }),
+                    ...(birthdate && { birthdate }),
+                };
+                await updateUser(userUpdateData);
+                updateUserContext({
+                    ...(normalizedEmail && { email: normalizedEmail }),
+                    ...(birthdate && { birthdate }),
+                });
+            }
+
+            if (photo) {
+                const formData = new FormData();
+                formData.append("userId", user.id.toString());
+                formData.append("file", photo);
+
+                await updateUserPhoto(formData);
+                updateUserContext({ photo: await convertToBase64(photo) });
+            }
+
+            toast.success("Profile updated successfully");
         } catch (err) {
-            toast.error("Error updating user");
+            toast.error("Error updating profile");
         }
     };
 
     const handlePhoto = (e) => {
-        try {
-            const file = e.target.files[0];
-            if (file) {
-                setPhoto(file);
-                setPreview(URL.createObjectURL(file));
-            }
-        } catch {
-            toast.error("No file selected");
-        }
-    };
 
-    const handleUpPhoto = async () => {
-        if (!photo) {
-            toast.warn("Please select a photo");
-            return;
+        const file = e.target.files[0];
+        if (file) {
+            setPhoto(file);
+            setIsPreviewModalOpen(true);
+            setPreview(URL.createObjectURL(file));
         }
 
-        /*console.log("User in handleUpPhoto:", user);*/
-
-        const formData = new FormData();
-        formData.append("userId", user.id.toString());
-        formData.append("file", photo);
-
-        try {
-            await updateUserPhoto(formData);
-            updateUserContext({ photo: await convertToBase64(photo) });
-            setPhoto(null);
-            setPreview(null);
-            toast.success("Photo uploaded!");
-        } catch {
-            toast.error("Upload failed");
-        }
     };
 
     const convertToBase64 = (file) => {
@@ -89,30 +90,42 @@ export default function EditProfile() {
         <div className="edit-profile-center">
             <div className="edit-profile-container">
                 <h2>Edit Profile</h2>
+                {currentPhoto && (<img src={currentPhoto} alt="Current Photo" className="photo-preview" />)}
                 <form onSubmit={handleSubmit}>
+                    <label htmlFor="photo">Photo</label>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhoto}
+                        className="file-input"
+                    />
+                    <label htmlFor="email">Email</label>
                     <input
                         type="email"
                         placeholder="Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
+                    <label htmlFor="birthdate">Birthdate</label>
                     <input
                         type="date"
                         value={birthdate?.split("T")[0] || ""}
                         onChange={(e) => setBirthdate(e.target.value)}
                     />
-                    <button type="submit">Save</button>
+                    <button type="submit" className="submit-button">Save changes</button>
+                    <button type="button" onClick={() => navigate("/products")} className="submit-button">Back</button>
                 </form>
-                <div className="photo-upload-container">
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePhoto}
-                    />
-                    {preview && <img src={preview} alt="Preview" className="photo-preview" />}
-                    <button onClick={handleUpPhoto} className="submit-button" disabled={!photo}>Upload photo</button>
-                    <button onClick={() => navigate("/products")} className="submit-button">Back</button>
-                </div>
+                {isPreviewModalOpen && (
+                    <div className="modal-overlay">
+                        <div className="modal-content">
+                            <h3>Preview new photo</h3>
+                            {preview && <img src={preview} alt="Preview" className="photo-preview" />}
+                            <div className="modal-buttons">
+                                <button onClick={() => setIsPreviewModalOpen(false)} className="submit-button">Ok</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
