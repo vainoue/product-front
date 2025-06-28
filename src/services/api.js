@@ -99,3 +99,8 @@ export async function updateUserPhoto(formData) {
     }
     return res.json();
 }
+
+export async function getProductById(id) {
+    const products = await getProducts();
+    return products.find(p => p.id === parseInt(id));
+}

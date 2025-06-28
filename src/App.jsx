@@ -3,6 +3,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Product from './pages/Product';
 import EditProfile from './pages/EditProfile';
+import NewProduct from './pages/NewProduct';
+import EditProduct from './pages/EditProduct';
 import { ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider, useAuth } from './pages/AuthContext';
@@ -25,6 +27,8 @@ function App() {
           <Route
             path="/products" element={<PrivateRoute><Product /></PrivateRoute>}
           />
+          <Route path="/new-product" element={<NewProduct />} />
+          <Route path="/edit-product/:id" element={<EditProduct />} />
           <Route path="/edit-profile" element={<PrivateRoute><EditProfile /></PrivateRoute>} />
           <Route path="/" element={<Navigate to="/login" replace />} />
         </Routes>

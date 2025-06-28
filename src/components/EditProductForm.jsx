@@ -14,12 +14,15 @@ export default function EditProductForm ({ product, onSave, onCancel }) {
             toast.warn("Please fill in all fields.");
             return;
         }
+        if (price <= 0 ) {
+            toast.warn("Invalid price");
+            return;
+        }
         onSave({ ...product, name, price: Number(price) });
     };
 
     return (
         <div className="edit-product-form">
-            <h2>Edit Product</h2>
             <TextInput
                 label="Name"
                 value={name}
